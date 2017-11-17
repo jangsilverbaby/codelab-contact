@@ -36,6 +36,21 @@ export default class Contact extends React.Component {
 
     }
 
+    componentWillMount(){
+      const contactData = localStorage.contactData;
+       if (contactData){
+        this.setState({
+          contactData: JSON.parse(contactData)
+        })
+    }
+  }
+
+  componentDidUpdate(precProps, prevState){
+    if(JSON.stringify(prevState.contactData) != JSON.stringify(this.state.ContactData)){
+      localStorage.contactData = JSON.stringify(this.state.contactData); 
+    }
+  }
+
     handleChange(e) {
         this.setState({
             keyword: e.target.value
@@ -57,6 +72,9 @@ export default class Contact extends React.Component {
     }
 
     handleRemove() {
+      if(this.state.selectedKey < 0){
+        return;
+      }
         this.setState({
             contactData: update(this.state.contactData,
                 { $splice: [[this.state.selectedKey, 1]] }
@@ -107,7 +125,10 @@ export default class Contact extends React.Component {
                 <div>{mapToComponents(this.state.contactData)}</div>
                 <ContactDetails
                     isSelected={this.state.selectedKey != -1}
-                    contact={this.state.contactData[this.state.selectedKey]}/>
+                    contact={this.state.contactData[this.state.selectedKey]}
+                    onRemove={this.handleRemove}
+                    onEdit={this.handleEdit}
+                    />
                 <ContactCreate
                     onCreate={this.handleCreate}
                 />
